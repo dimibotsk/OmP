@@ -1,6 +1,0 @@
-samplename	filename	condition	paired	stranded
-WT1	/media/dimbo/10T/TAL_LAB/Nextflow/results/filtered_bam/NGS0583_WT1untreated.filtered.bam	WT	single	no
-WT2	/media/dimbo/10T/TAL_LAB/Nextflow/results/filtered_bam/NGS0584_WT2untreated.filtered.bam	WT	single	no
-KO1	/media/dimbo/10T/TAL_LAB/Nextflow/results/filtered_bam/NGS0711_set8tcp_1.filtered.bam	KO	single	no
-KO2	/media/dimbo/10T/TAL_LAB/Nextflow/results/filtered_bam/NGS0590_set8tcp2.filtered.bam	KO	single	no
-

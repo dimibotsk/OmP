@@ -1,2 +1,0 @@
-# WT
-macs2 callpeak --treatment WT_H3K27.downsampled.bam -c WTuntr_Input.bam --format BAM --gsize mm -n WT_H3K27 -p 0.0000000000001

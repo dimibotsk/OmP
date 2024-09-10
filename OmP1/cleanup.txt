@@ -1,1 +1,0 @@
-rm -r results/hisat/ results/merged/ results/indexed/
