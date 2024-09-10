@@ -1,0 +1,5 @@
+bedtools intersect -wa -a WT_CTCF_peaks.narrowPeak -b KO_CTCF_peaks.narrowPeak -f 0.2 > overlapped_peaks.CTCF.bed
+
+bedtools intersect -wa -a WT_CTCF_peaks.narrowPeak -b KO_CTCF_peaks.narrowPeak -v > loss.CTCF.bed
+
+bedtools intersect -wa -a KO_CTCF_peaks.narrowPeak -b WT_CTCF_peaks.narrowPeak -v > gain.CTCF.bed

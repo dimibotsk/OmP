@@ -1,0 +1,4 @@
+awk '{print $1 "\t" $2 "\t" $3}' KO_CTCF_peaks.narrowPeak > KO.bed
+sort-bed KO.bed > KO_CTCF.bed
+bedToBigBed KO_CTCF.bed mm10.chrom.sizes KO_CTCF.bb
+

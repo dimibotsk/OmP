@@ -1,0 +1,42 @@
+# FOR WT
+
+# KEEP ONLY ENRICHMENT (PEAK REGIONS) FROM BAM FILE
+samtools view WT_LaminAC_NEW.downsampled.bam -L WT_LaminAC_NEW.downsampled-W20000-G20000.scoreisland -b -@ 8 > WT_Enrichment.bam
+
+samtools index WT_Enrichment.bam
+
+bamCoverage -b WT_Enrichment.bam -o WT_Enrichment.bw -p 8
+
+# KEEP ONLY BACKGROUND (REGIONS THAT ARE OUTSIDE OF PEAK FILE) 
+bedtools intersect -abam WT_LaminAC_NEW.downsampled.bam -b WT_LaminAC_NEW.downsampled-W20000-G20000.scoreisland -v > WT_Background.bam
+
+samtools index WT_Background.bam
+
+bamCoverage -b WT_Background.bam -o WT_Background.bw -p 8
+
+
+# CREATE BW FILE WITH ENRICHMENT AND BACKGROUND
+bamCompare -b1 WT_Enrichment.bam -b2 WT_Background.bam --operation subtract --scaleFactorsMethod None -p 8 -o WT_LAMIN.bw
+
+
+
+# FOR KO
+samtools view Set8KO_LaminAC.downsampled.bam -L Set8KO_LaminAC.downsampled-W20000-G20000.scoreisland -b -@ 8 > Set8KO_Enrichment.bam
+
+samtools index Set8KO_Enrichment.bam
+
+bedtools intersect -abam Set8KO_LaminAC.downsampled.bam -b Set8KO_LaminAC.downsampled-W20000-G20000.scoreisland -v > Set8KO_Background.bam
+
+samtools index Set8KO_Background.bam
+
+bamCompare -b1 Set8KO_Enrichment.bam -b2 Set8KO_Background.bam --operation subtract --scaleFactorsMethod None -p 8 -o Set8KO_LAMIN.bw
+
+
+# (CREATE bed files into bedgraph)
+sort-bed Set8KO_LaminAC.downsampled-W20000-G20000.scoreisland > Set8KO_Peaks.bed
+
+bedToBigBed Set8KO_Peaks.bed mm10.chrom.sizes Set8KO_Peaks.bb
+
+
+
+

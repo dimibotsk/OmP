@@ -1,0 +1,21 @@
+# WT REF
+computeMatrix reference-point --referencePoint center -S WT_SMC3.bw Set8KO_SMC3.bw -R WT_SMC3_peaks.narrowPeak -b 5000 -a 5000 --skipZeros -p 8 -out Matrix_WT_ALL
+
+plotHeatmap -m Matrix_WT_ALL -out WT_ALL.pdf  --plotFileFormat "pdf" --interpolationMethod nearest -z " " -x " " --boxAroundHeatmaps yes  --colorList 'white,whitesmoke,seashell,mistyrose,salmon,r' 'white,whitesmoke,seashell,greenyellow,yellowgreen,green' --samplesLabel "WT SMC3" "Set8KO SMC3"  --refPointLabel "WT Center"  --heatmapWidth 5  --missingDataColor 1  --dpi 500 --zMax 40 --whatToShow 'heatmap and colorbar'
+
+# OVERLAP
+computeMatrix reference-point --referencePoint center -S WT_SMC3.bw Set8KO_SMC3.bw -R overlapped_peaks.SMC3.bed -b 5000 -a 5000 --skipZeros -p 8 -out Matrix_OVERLAPPED
+
+plotHeatmap -m Matrix_OVERLAPPED -out WT_OVERLAPPED.pdf  --plotFileFormat "pdf" --interpolationMethod nearest -z " " -x " " --boxAroundHeatmaps yes  --colorList 'white,whitesmoke,seashell,mistyrose,salmon,r' 'white,whitesmoke,seashell,greenyellow,yellowgreen,green' --samplesLabel "WT SMC3" "Set8KO SMC3"  --refPointLabel "Overlap Center"  --heatmapWidth 5  --missingDataColor 1  --dpi 500 --zMax 80 --whatToShow 'heatmap and colorbar'
+
+# GAIN
+computeMatrix reference-point --referencePoint center -S WT_SMC3.bw Set8KO_SMC3.bw -R gain.SMC3.bed -b 5000 -a 5000 --skipZeros -p 8 -out Matrix_GAIN
+
+plotHeatmap -m Matrix_GAIN -out GAIN.pdf  --plotFileFormat "pdf" --interpolationMethod nearest -z " " -x " " --boxAroundHeatmaps yes  --colorList 'white,whitesmoke,seashell,mistyrose,salmon,r' 'white,whitesmoke,seashell,greenyellow,yellowgreen,green' --samplesLabel "WT SMC3" "Set8KO SMC3"  --refPointLabel "Gain Center"  --heatmapWidth 5  --missingDataColor 1  --dpi 500 --zMax 40 --whatToShow 'heatmap and colorbar'
+
+# LOSS
+
+computeMatrix reference-point --referencePoint center -S WT_SMC3.bw Set8KO_SMC3.bw -R loss.SMC3.bed -b 5000 -a 5000 --skipZeros -p 8 -out Matrix_LOSS
+
+plotHeatmap -m Matrix_LOSS -out LOSS.pdf  --plotFileFormat "pdf" --interpolationMethod nearest -z " " -x " " --boxAroundHeatmaps yes  --colorList 'white,whitesmoke,seashell,mistyrose,salmon,r' 'white,whitesmoke,seashell,greenyellow,yellowgreen,green' --samplesLabel "WT SMC3" "Set8KO SMC3"  --refPointLabel "Loss Center"  --heatmapWidth 5  --missingDataColor 1  --dpi 500 --zMax 40 --whatToShow 'heatmap and colorbar'
+
