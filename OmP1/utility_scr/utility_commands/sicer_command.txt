@@ -1,0 +1,1 @@
+sicer -t $bam_file  -s mm10 -w 20000 -g 20000 --false_discovery_rate 0.001 --effective_genome_fraction 0.88 -o Set8KO -cpu 7

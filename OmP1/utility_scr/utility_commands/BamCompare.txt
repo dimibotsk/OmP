@@ -1,0 +1,1 @@
+bamCompare -b1 KO_H4K20_Enrichment.bam -b2 KO_H4K20_Background.bam --operation subtract --scaleFactorsMethod None -p 8 -o bamCompare_scaleFactor.bw
