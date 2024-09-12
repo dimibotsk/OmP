@@ -1,4 +1,4 @@
-# scRNA-seq Analysis Pipeline using CellRanger/Seurat
+# scRNA-seq Data Analysis Pipeline
 
 This repository contains scripts for running Cell Ranger analysis on single-cell RNA sequencing (scRNA-seq) data. The pipeline is implemented in R and uses a YAML configuration file for easy customization.
 
