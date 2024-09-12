@@ -1,0 +1,20 @@
+# Cell Ranger configuration
+
+# Sample sheet path
+sample_sheet: '/media/dimbo/10T2/TEST_SCRNA_PIPE/sample_sheet.csv'
+
+# Reference transcriptome directory (pre-built with cellranger mkref)
+reference: '/media/dimbo/10T/TAL_LAB/Data/Setdb1/scRNA/Talianidis_GFP_2_fixed/analysis/Genome/refdata-gex-mm10-2020-A'
+
+# Output directory
+outdir: '/media/dimbo/10T2/TEST_SCRNA_PIPE/results'
+
+# Computational resources
+cpus: 8
+memory: 50
+
+# Maximum number of parallel processes
+max_parallel_processes: 4
+
+# Report file path is now relative to outdir
+report_file: 'cellranger_report.html'
