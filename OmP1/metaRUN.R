@@ -7,7 +7,7 @@ myTargets <- readTargets(file.path(current_directory, "targets_single.txt"))
 result <- metaseqr2( sampleList = file.path(current_directory, "targets_single.txt"),
                      excludeList = NULL,
                      fileType = c("bam"),
-                     contrast=c("WT_vs_KO"),
+                     contrast=c("KO_vs_WT"),
                      #  counts=mm9GeneCounts,
                      #  sampleList=sampleListMm9,
                      #  contrast=c("adult_8_weeks_vs_e14.5"),
