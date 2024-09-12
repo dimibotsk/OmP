@@ -28,6 +28,13 @@ This comprehensive suite of bioinformatics pipelines is designed for the end-to-
    ```bash
    bash <conda-installer-name>-latest-Linux-x86_64.sh
    ```
+3. **Install metaseqR2**:
+   ```bash
+   if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+   BiocManager::install("metaseqR2")
+   ```
 ## Usage
 - **For ChIP-seq**:
   ```bash
