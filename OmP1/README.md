@@ -48,6 +48,20 @@ This comprehensive suite of bioinformatics pipelines is designed for the end-to-
 
 Replace `.SE.nf` with `.PE.nf` for paired-end data processing.
 
+## Scripts
+- `ReadCount.R`: An R script for counting reads in BAM and FASTQ files and generating summary plots and CSV files.
+- `metaRUN.R`: An R script for performing differential gene expression analysis using the MetaSeqR2 package.
+
 ## Output
 The output files are organized within the `results` directory, with subdirectories corresponding to each analysis step. The differential expression analysis results can be found in the `diff_exp` directory.
+
+
+
+
+
+
+
+
+
+
 
