@@ -28,7 +28,7 @@ The pipeline automates the process of running Cell Ranger count on multiple scRN
 
 1. Clone this repository:
    ```
-   git clone https://github.com/your-username/scrnaseq-cellranger-pipeline.git
+   git clone https://github.com/dimibotsk/scrnaseq-cellranger-pipeline.git
    cd scrnaseq-cellranger-pipeline
    ```
 
