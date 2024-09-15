@@ -6,6 +6,8 @@ library(patchwork)
 library(DoubletFinder)
 library(tidyr)
 library(tibble)
+library(SCP)
+
 
 # Read configuration file
 config <- read.table("config.txt", sep = "=", row.names = 1, col.names = c("name", "path"), stringsAsFactors = FALSE)
@@ -77,6 +79,7 @@ summary_text <- c(
 )
 
 writeLines(summary_text, "filtering_summary.txt")
+file.rename("filtering_summary.txt", "post_QC/filtering_summary.txt")
 
 # Save filtered Seurat objects
 #saveRDS(wt_rep1_filtered, "WT_REP1_filtered.rds")
@@ -146,6 +149,14 @@ umap_plot <- DimPlot(integrated_seurat, reduction = "umap",
                      group.by = c("orig.ident", "condition", "seurat_clusters"), 
                      combine = FALSE)
 ggsave("umap_plot_integrated.png", plot = wrap_plots(umap_plot, ncol = 3), width = 18, height = 6)
+
+umap_plot <- DimPlot(integrated_seurat, reduction = "umap", label = TRUE)
+ggsave("umap_plot_integrated_labeled.png")
+
+dir.create("umaps", showWarnings = FALSE)
+file.rename("umap_plot_integrated.png", "umaps/umap_plot_integrated.png")
+file.rename("umap_plot_integrated_labeled.png", "umaps/umap_plot_integrated_labeled.png")
+
 
 # Save the integrated and processed Seurat object
 saveRDS(integrated_seurat, file = "integrated_processed_seurat.rds")
@@ -240,12 +251,153 @@ comparison_plot <- ggplot(cluster_stats_long, aes(x = Cluster, y = Percentage, f
 ggsave("cluster_percentages_comparison.png", comparison_plot, width = 12, height = 8, bg = "white")
 
 
+# Create directories
+dir.create("integrated", showWarnings = FALSE)
+file.rename("cluster_statistics_summary.tsv", "integrated/cluster_statistics_summary.tsv")
+file.rename("cluster_percentages_comparison.png", "integrated/cluster_percentages_comparison.png")
+
+# split object to wt and ko
+# Create WT Seurat object
+wt_cells <- WhichCells(integrated_seurat, expression = condition == "WT")
+WT <- subset(integrated_seurat, cells = wt_cells)
+
+# Create KO Seurat object
+ko_cells <- WhichCells(integrated_seurat, expression = condition == "KO")
+KO <- subset(integrated_seurat, cells = ko_cells)
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+# Differential Expression Analysis between KO and WT
+
+# Set the default assay to "RNA" for DE analysis
+DefaultAssay(integrated_seurat) <- "RNA"
+
+# Join layers for the integrated assay if necessary
+integrated_seurat <- JoinLayers(integrated_seurat)
+
+# Create a directory for DE results if it doesn't exist
+dir.create("DE_results", showWarnings = FALSE)
+
+# Perform differential expression analysis
+# 1. Genes upregulated in KO compared to WT
+KO_EXPRESSED_MARKERS <- FindMarkers(integrated_seurat, 
+                                    ident.1 = "KO", 
+                                    ident.2 = "WT", 
+                                    group.by = "condition",
+                                    min.pct = 0.25, 
+                                    logfc.threshold = 0.25,
+                                    only.pos = TRUE)
+
+# Add gene names to the results
+KO_EXPRESSED_MARKERS$gene <- rownames(KO_EXPRESSED_MARKERS)
+
+# Save KO upregulated genes as TSV
+write.table(KO_EXPRESSED_MARKERS, "DE_results/KO_upregulated_genes.tsv", sep="\t", quote=FALSE, row.names=FALSE)
+
+# 2. Genes upregulated in WT compared to KO
+WT_EXPRESSED_MARKERS <- FindMarkers(integrated_seurat, 
+                                    ident.1 = "WT", 
+                                    ident.2 = "KO", 
+                                    group.by = "condition",
+                                    min.pct = 0.25, 
+                                    logfc.threshold = 0.25,
+                                    only.pos = TRUE)
+
+# Add gene names to the results
+WT_EXPRESSED_MARKERS$gene <- rownames(WT_EXPRESSED_MARKERS)
+
+# Save WT upregulated genes as TSV
+write.table(WT_EXPRESSED_MARKERS, "DE_results/WT_upregulated_genes.tsv", sep="\t", quote=FALSE, row.names=FALSE)
 
 
 
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+# Annotate clusters based on marker genes
+
+# Function to read cell type markers from markers.txt file
+read_cell_type_markers <- function(file_path = "markers.txt") {
+  if (!file.exists(file_path)) {
+    stop("markers.txt file not found. Please ensure it's in the current working directory.")
+  }
+  
+  lines <- readLines(file_path)
+  lines <- lines[!grepl("^#", lines)]  # Remove comment lines
+  markers <- list()
+  for (line in lines) {
+    if (grepl("=", line)) {
+      parts <- strsplit(line, "=")[[1]]
+      cell_type <- trimws(parts[1])
+      genes <- strsplit(trimws(parts[2]), ",")[[1]]
+      markers[[cell_type]] <- trimws(genes)
+    }
+  }
+  return(markers)
+}
 
 
+# Read markers
+markers <- read_cell_type_markers()
 
+# Flatten the markers list into a data frame
+markers_df <- do.call(rbind, lapply(names(markers), function(cell_type) {
+  data.frame(cell_type = cell_type, gene = markers[[cell_type]])
+}))
 
+# Create annotation_results directory
+dir.create("annotation_results", showWarnings = FALSE)
 
+# Function to create improved dotplots
+create_dotplots <- function(integrated_seurat, condition) {
+  DefaultAssay(integrated_seurat) <- "RNA"
+  
+  # Create dotplots with improved aesthetics
+  for (cell_type in unique(markers_df$cell_type)) {
+    genes <- markers_df$gene[markers_df$cell_type == cell_type]
+    genes <- genes[genes %in% rownames(integrated_seurat)]
+    
+    if (length(genes) > 0) {
+      p <- DotPlot(integrated_seurat, features = genes, group.by = "seurat_clusters", 
+                   cols = c("deepskyblue", "darkorange"), dot.scale = 8) +
+        ggtitle(paste("Marker Expression for", cell_type, "in", condition)) +
+        theme_minimal() +
+        theme(
+          axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+          axis.text.y = element_text(size = 10),
+          plot.title = element_text(size = 14, face = "bold"),
+          legend.text = element_text(size = 8),
+          legend.title = element_text(size = 10),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_rect(fill = "white", colour = "black"),
+          plot.background = element_rect(fill = "white", colour = NA)
+        ) +
+        guides(size = guide_legend(title = "Percent Expressed"),
+               color = guide_colorbar(title = "Average Expression"))
+      
+      filename <- paste0("dotplot_", make.names(cell_type), "_", condition, ".png")
+      filepath <- file.path("annotation_results", filename)
+      ggsave(filepath, plot = p, bg = "white")
+    }
+  }
+}
 
+# Process WT condition
+wt_cells <- WhichCells(integrated_seurat, expression = condition == "WT")
+wt_seurat <- subset(integrated_seurat, cells = wt_cells)
+create_dotplots(wt_seurat, "WT")
+
+# Process KO condition
+ko_cells <- WhichCells(integrated_seurat, expression = condition == "KO")
+ko_seurat <- subset(integrated_seurat, cells = ko_cells)
+create_dotplots(ko_seurat, "KO")
+
+print("Dotplot generation completed for WT and KO separately. Improved dotplots have been saved in the 'annotation_results' directory.")
