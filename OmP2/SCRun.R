@@ -313,8 +313,6 @@ WT_EXPRESSED_MARKERS$gene <- rownames(WT_EXPRESSED_MARKERS)
 # Save WT upregulated genes as TSV
 write.table(WT_EXPRESSED_MARKERS, "DE_results/WT_upregulated_genes.tsv", sep="\t", quote=FALSE, row.names=FALSE)
 
-
-
 ########################################################################################################################################################
 
 ########################################################################################################################################################
@@ -401,3 +399,61 @@ ko_seurat <- subset(integrated_seurat, cells = ko_cells)
 create_dotplots(ko_seurat, "KO")
 
 print("Dotplot generation completed for WT and KO separately. Improved dotplots have been saved in the 'annotation_results' directory.")
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+# Rename Clusters and convert to SCP
+
+#integrated_seurat <- readRDS("integrated_processed_seurat.rds")
+# Rename Clusters based in annotation and convert it to SCP
+integrated_seurat$seurat_clusters <- factor(x = integrated_seurat$seurat_clusters,
+                                                 levels = c("1","6", "4","7","0","3", "11", "10", "5",
+                                                            "2","8","9","12","13"),
+                                                 labels = c( "Stem I", "Stem II", "TA","Progenitor I", "Progenitor II",
+                                                             "Ent.Immature","Ent.Mature","Paneth","Goblet I","Goblet II", "Tuft", 
+                                                             "Enteroendocrine I", "Enteroendocrine II","Unclassified"))
+
+colnames(integrated_seurat@meta.data)[colnames(integrated_seurat@meta.data) == "seurat_clusters"] <- "CellType"
+
+# Umap Mixed
+
+umap_mixed = CellDimPlot(
+  srt = integrated_seurat, group.by = c("CellType"), 
+  reduction = "UMAP", theme_use = "theme_blank", show_stat = TRUE, 
+  palette = "Set2",
+  #  palette = "Spectral", label = TRUE,
+) + theme(text=element_text(family = "FreeSerif" ))
+
+ggsave("umap_plot_mixed.png", plot = wrap_plots(umap_mixed), width = 8, height = 7, dpi = 300)
+file.rename("umap_plot_mixed.png", "umaps/umap_plot_mixed.png")
+
+# Change replicate names within object (merging replicates wt1/2 and ko1/2)
+integrated_seurat$orig.ident=plyr::mapvalues(x=integrated_seurat$orig.ident, from = c("WT_REP1", "WT_REP2", "KO_REP1", "KO_REP2"), 
+                                          to = c("Setdb1KO", "Setdb1KO", "Lgr5Cre", "Lgr5Cre"))
+
+umap_mixed = CellDimPlot(
+  srt = integrated_seurat, group.by = c("CellType"),split.by = "orig.ident", 
+  reduction = "UMAP", theme_use = "theme_blank", show_stat = TRUE, 
+  palette = "Set2",
+  #  palette = "Spectral", label = TRUE,
+) + theme(text=element_text(family = "FreeSerif" ))
+
+ggsave("umap_plot_split.png", plot = wrap_plots(umap_mixed), width = 14, height = 6, dpi = 300)
+file.rename("umap_plot_split.png", "umaps/umap_plot_split.png")
+
+
+# Reset the KO and WT with the new labels
+WT <- subset(integrated_seurat, cells = wt_cells)
+KO <- subset(integrated_seurat, cells = ko_cells)
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+########################################################################################################################################################
+
+
