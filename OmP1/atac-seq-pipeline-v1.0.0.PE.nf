@@ -40,7 +40,7 @@ process TRIMMOMATIC {
 
     script:
     """
-    trimmomatic PE -threads ${task.cpus} -phred33 \
+    TrimmomaticPE -threads ${task.cpus} -phred33 \
         ${reads[0]} ${reads[1]} \
         ${sample_id}_r1_trimmed.fastq.gz ${sample_id}_r1_unpaired.fastq.gz \
         ${sample_id}_r2_trimmed.fastq.gz ${sample_id}_r2_unpaired.fastq.gz \
